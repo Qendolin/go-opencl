@@ -64,6 +64,8 @@ func (k *Kernel) SetArg(index int, arg interface{}) error {
 		return k.SetArgBuffer(index, val)
 	case LocalBuffer:
 		return k.SetArgLocal(index, int(val))
+	case *Sampler:
+		return k.SetArgSampler(index, val)
 	default:
 		return ErrUnsupportedArgumentType{Index: index, Value: arg}
 	}
@@ -71,6 +73,10 @@ func (k *Kernel) SetArg(index int, arg interface{}) error {
 
 func (k *Kernel) SetArgBuffer(index int, buffer *MemObject) error {
 	return k.SetArgUnsafe(index, int(unsafe.Sizeof(buffer.clMem)), unsafe.Pointer(&buffer.clMem))
+}
+
+func (k *Kernel) SetArgSampler(index int, sampler *Sampler) error {
+	return k.SetArgUnsafe(index, int(unsafe.Sizeof(sampler.clSampler)), unsafe.Pointer(&sampler.clSampler))
 }
 
 func (k *Kernel) SetArgFloat32(index int, val float32) error {
