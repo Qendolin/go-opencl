@@ -13,3 +13,9 @@ Changed `data []byte` to a `length int, data unsafe.Pointer` for `CreateImage`, 
 Because of this change `CreateBufferFloat32` has been removed.
 
 Updated `ByteSlice` to use the new `unsafe.Slice`.
+
+Applied [zadeck's patch](https://github.com/jgillich/go-opencl/issues/12)
+
+Defined `CL_TARGET_OPENCL_VERSION` in `cl.h`
+
+Created go.mod and updated build directives
