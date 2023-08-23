@@ -31,7 +31,7 @@ func (ctx *Context) CreateImageSimple(flags MemFlag, width, height int, channelO
 		Width:  width,
 		Height: height,
 	}
-	return ctx.CreateImage(flags, format, desc, data)
+	return ctx.CreateImage(flags, format, desc, length, data)
 }
 
 func (ctx *Context) CreateImageFromImage(flags MemFlag, img image.Image) (*MemObject, error) {
@@ -44,7 +44,7 @@ func (ctx *Context) CreateImageFromImage(flags MemFlag, img image.Image) (*MemOb
 			Height:   m.Bounds().Dy(),
 			RowPitch: m.Stride,
 		}
-		return ctx.CreateImage(flags, format, desc, m.Pix)
+		return ctx.CreateImage(flags, format, desc, len(m.Pix), unsafe.Pointer(&m.Pix[0]))
 	case *image.RGBA:
 		format := ImageFormat{ChannelOrderRGBA, ChannelDataTypeUNormInt8}
 		desc := ImageDescription{
@@ -53,7 +53,7 @@ func (ctx *Context) CreateImageFromImage(flags MemFlag, img image.Image) (*MemOb
 			Height:   m.Bounds().Dy(),
 			RowPitch: m.Stride,
 		}
-		return ctx.CreateImage(flags, format, desc, m.Pix)
+		return ctx.CreateImage(flags, format, desc, len(m.Pix), unsafe.Pointer(&m.Pix[0]))
 	}
 
 	b := img.Bounds()
@@ -72,5 +72,5 @@ func (ctx *Context) CreateImageFromImage(flags MemFlag, img image.Image) (*MemOb
 			dataOffset += 4
 		}
 	}
-	return ctx.CreateImageSimple(flags, w, h, ChannelOrderRGBA, ChannelDataTypeUNormInt8, data)
+	return ctx.CreateImageSimple(flags, w, h, ChannelOrderRGBA, ChannelDataTypeUNormInt8, len(data), unsafe.Pointer(&data[0]))
 }
