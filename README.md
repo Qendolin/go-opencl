@@ -19,3 +19,5 @@ Applied [zadeck's patch](https://github.com/jgillich/go-opencl/issues/12)
 Defined `CL_TARGET_OPENCL_VERSION` in `cl.h`
 
 Created go.mod and updated build directives
+
+Added `CreateSampler` and related types

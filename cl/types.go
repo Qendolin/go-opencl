@@ -335,6 +335,23 @@ func (f ImageFormat) toCl() C.cl_image_format {
 	return format
 }
 
+type SamplerAddressingMode int
+
+const (
+	AddressingModeMirroredRepeat SamplerAddressingMode = C.CL_ADDRESS_MIRRORED_REPEAT
+	AddressingModeRepeat         SamplerAddressingMode = C.CL_ADDRESS_REPEAT
+	AddressingModeClampToEdge    SamplerAddressingMode = C.CL_ADDRESS_CLAMP_TO_EDGE
+	AddressingModeClamp          SamplerAddressingMode = C.CL_ADDRESS_CLAMP
+	AddressingModeNone           SamplerAddressingMode = C.CL_ADDRESS_NONE
+)
+
+type SamplerFilterMode int
+
+const (
+	FilterModeNearest SamplerFilterMode = C.CL_FILTER_NEAREST
+	FilterModeLinear  SamplerFilterMode = C.CL_FILTER_LINEAR
+)
+
 type ProfilingInfo int
 
 const (
@@ -469,4 +486,25 @@ func (mb *MappedMemObject) RowPitch() int {
 
 func (mb *MappedMemObject) SlicePitch() int {
 	return mb.slicePitch
+}
+
+type Sampler struct {
+	clSampler C.cl_sampler
+}
+
+func newSampler(clSampler C.cl_sampler) *Sampler {
+	s := &Sampler{clSampler: clSampler}
+	runtime.SetFinalizer(s, releaseSampler)
+	return s
+}
+
+func releaseSampler(s *Sampler) {
+	if s.clSampler != nil {
+		C.clReleaseSampler(s.clSampler)
+		s.clSampler = nil
+	}
+}
+
+func (s *Sampler) Release() {
+	releaseSampler(s)
 }
