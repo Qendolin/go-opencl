@@ -153,20 +153,20 @@ func (q *CommandQueue) EnqueueNDRangeKernel(kernel *Kernel, globalWorkOffset, gl
 }
 
 // EnqueueReadImage enqueues a command to read from a 2D or 3D image object to host memory.
-func (q *CommandQueue) EnqueueReadImage(image *MemObject, blocking bool, origin, region [3]int, rowPitch, slicePitch int, data []byte, eventWaitList []*Event) (*Event, error) {
+func (q *CommandQueue) EnqueueReadImage(image *MemObject, blocking bool, origin, region [3]int, rowPitch, slicePitch int, data unsafe.Pointer, eventWaitList []*Event) (*Event, error) {
 	cOrigin := sizeT3(origin)
 	cRegion := sizeT3(region)
 	var event C.cl_event
-	err := toError(C.clEnqueueReadImage(q.clQueue, image.clMem, clBool(blocking), &cOrigin[0], &cRegion[0], C.size_t(rowPitch), C.size_t(slicePitch), unsafe.Pointer(&data[0]), C.cl_uint(len(eventWaitList)), eventListPtr(eventWaitList), &event))
+	err := toError(C.clEnqueueReadImage(q.clQueue, image.clMem, clBool(blocking), &cOrigin[0], &cRegion[0], C.size_t(rowPitch), C.size_t(slicePitch), data, C.cl_uint(len(eventWaitList)), eventListPtr(eventWaitList), &event))
 	return newEvent(event), err
 }
 
 // EnqueueWriteImage enqueues a command to write from a 2D or 3D image object to host memory.
-func (q *CommandQueue) EnqueueWriteImage(image *MemObject, blocking bool, origin, region [3]int, rowPitch, slicePitch int, data []byte, eventWaitList []*Event) (*Event, error) {
+func (q *CommandQueue) EnqueueWriteImage(image *MemObject, blocking bool, origin, region [3]int, rowPitch, slicePitch int, data unsafe.Pointer, eventWaitList []*Event) (*Event, error) {
 	cOrigin := sizeT3(origin)
 	cRegion := sizeT3(region)
 	var event C.cl_event
-	err := toError(C.clEnqueueWriteImage(q.clQueue, image.clMem, clBool(blocking), &cOrigin[0], &cRegion[0], C.size_t(rowPitch), C.size_t(slicePitch), unsafe.Pointer(&data[0]), C.cl_uint(len(eventWaitList)), eventListPtr(eventWaitList), &event))
+	err := toError(C.clEnqueueWriteImage(q.clQueue, image.clMem, clBool(blocking), &cOrigin[0], &cRegion[0], C.size_t(rowPitch), C.size_t(slicePitch), data, C.cl_uint(len(eventWaitList)), eventListPtr(eventWaitList), &event))
 	return newEvent(event), err
 }
 

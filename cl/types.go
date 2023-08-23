@@ -6,7 +6,6 @@ import "C"
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"runtime"
 	"strings"
 	"unsafe"
@@ -453,12 +452,7 @@ type MappedMemObject struct {
 }
 
 func (mb *MappedMemObject) ByteSlice() []byte {
-	var byteSlice []byte
-	sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&byteSlice))
-	sliceHeader.Cap = mb.size
-	sliceHeader.Len = mb.size
-	sliceHeader.Data = uintptr(mb.ptr)
-	return byteSlice
+	return unsafe.Slice((*byte)(mb.ptr), mb.size)
 }
 
 func (mb *MappedMemObject) Ptr() unsafe.Pointer {

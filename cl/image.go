@@ -10,25 +10,21 @@ import (
 	"unsafe"
 )
 
-func (ctx *Context) CreateImage(flags MemFlag, imageFormat ImageFormat, imageDesc ImageDescription, data []byte) (*MemObject, error) {
+func (ctx *Context) CreateImage(flags MemFlag, imageFormat ImageFormat, imageDesc ImageDescription, length int, data unsafe.Pointer) (*MemObject, error) {
 	format := imageFormat.toCl()
 	desc := imageDesc.toCl()
-	var dataPtr unsafe.Pointer
-	if data != nil {
-		dataPtr = unsafe.Pointer(&data[0])
-	}
 	var err C.cl_int
-	clBuffer := C.clCreateImage(ctx.clContext, C.cl_mem_flags(flags), &format, &desc, dataPtr, &err)
+	clBuffer := C.clCreateImage(ctx.clContext, C.cl_mem_flags(flags), &format, &desc, data, &err)
 	if err != C.CL_SUCCESS {
 		return nil, toError(err)
 	}
 	if clBuffer == nil {
 		return nil, ErrUnknown
 	}
-	return newMemObject(clBuffer, len(data)), nil
+	return newMemObject(clBuffer, length), nil
 }
 
-func (ctx *Context) CreateImageSimple(flags MemFlag, width, height int, channelOrder ChannelOrder, channelDataType ChannelDataType, data []byte) (*MemObject, error) {
+func (ctx *Context) CreateImageSimple(flags MemFlag, width, height int, channelOrder ChannelOrder, channelDataType ChannelDataType, length int, data unsafe.Pointer) (*MemObject, error) {
 	format := ImageFormat{channelOrder, channelDataType}
 	desc := ImageDescription{
 		Type:   MemObjectTypeImage2D,
