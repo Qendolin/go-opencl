@@ -4,6 +4,13 @@
 package cl
 
 // #include "cl.h"
+//
+// /* OpenCL 2.0's cl.h header contains an anonymous union that contains the
+//    variable buffer.  This cannot be handled directly in cgo so we add a
+//    small C helper function to do the dirty work. */
+// void set_cl_image_desc_buffer (cl_image_desc *desc, cl_mem mem) {
+//    desc->buffer = mem;
+// }
 import "C"
 
 const (
