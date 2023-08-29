@@ -111,24 +111,20 @@ func (ctx *Context) CreateProgramWithSource(sources []string) (*Program, error) 
 	return program, nil
 }
 
-func (ctx *Context) CreateBufferUnsafe(flags MemFlag, size int, dataPtr unsafe.Pointer) (*MemObject, error) {
+func (ctx *Context) CreateBuffer(flags MemFlag, length int, dataPtr unsafe.Pointer) (*MemObject, error) {
 	var err C.cl_int
-	clBuffer := C.clCreateBuffer(ctx.clContext, C.cl_mem_flags(flags), C.size_t(size), dataPtr, &err)
+	clBuffer := C.clCreateBuffer(ctx.clContext, C.cl_mem_flags(flags), C.size_t(length), dataPtr, &err)
 	if err != C.CL_SUCCESS {
 		return nil, toError(err)
 	}
 	if clBuffer == nil {
 		return nil, ErrUnknown
 	}
-	return newMemObject(clBuffer, size), nil
+	return newMemObject(clBuffer, length), nil
 }
 
 func (ctx *Context) CreateEmptyBuffer(flags MemFlag, size int) (*MemObject, error) {
-	return ctx.CreateBufferUnsafe(flags, size, nil)
-}
-
-func (ctx *Context) CreateBuffer(flags MemFlag, length int, data unsafe.Pointer) (*MemObject, error) {
-	return ctx.CreateBufferUnsafe(flags, length, data)
+	return ctx.CreateBuffer(flags, size, nil)
 }
 
 func (ctx *Context) CreateUserEvent() (*Event, error) {
